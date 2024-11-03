@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+.hero-section {
+    text-align: left;
+    padding: 40px 20px;
+    background-color: #eef7ff; /* Warna latar belakang fallback */
+    background-image: url('../assets/bg1.png'); /* Ganti dengan path gambar yang sesuai */
+    background-size: cover; /* Mengatur ukuran gambar agar menutupi seluruh area */
+    background-position: center; /* Mengatur posisi gambar di tengah */
+    background-repeat: no-repeat; /* Menghindari pengulangan gambar */
+}
+
+.title {
+    font-size: 55px; /* Ukuran font untuk semua judul */
+    color: #007bff; /* Warna untuk semua judul */
+    font-family: 'Poppins', sans-serif; /* Menggunakan font Poppins */
+    font-weight: 600; /* Berat font untuk judul, menggunakan 600 untuk bold */
+    margin: 5px 0; /* Jarak antara setiap judul */
+    margin-left: 20px; /* Menambahkan margin kiri untuk menggeser ke kanan */
+    line-height: 1.1; /* Mengatur jarak antar baris menjadi lebih rapat */
+}
+
+.paragraph {
+    font-size: 14px; /* Ukuran font untuk paragraf */
+    color: #007bff; /* Warna biru untuk teks paragraf */
+    font-family: 'Poppins', sans-serif; /* Menggunakan font Poppins untuk paragraf */
+    font-weight: 400; /* Berat font untuk paragraf */
+    max-width: 500px; /* Batasi lebar maksimum paragraf agar tidak terlalu lebar */
+    margin: 5px 0; /* Jarak antara setiap paragraf */
+    margin-left: 20px; /* Menambahkan margin kiri untuk menggeser ke kanan */
+}
+
+.illustration {
+    margin-top: 20px; /* Margin atas untuk ilustrasi */
+}
