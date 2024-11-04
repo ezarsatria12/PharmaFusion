@@ -1,0 +1,50 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #f8f8f8;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Styling untuk nav-links */
+.nav-links {
+  display: flex; /* Mengatur tautan menjadi dalam barisan horizontal */
+  gap: 20px; /* Jarak antara tautan */
+  align-items: center; /* Menyelaraskan elemen di tengah secara vertikal */
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #7b4e4e;
+}
+
+/* Tambahan styling untuk tombol */
+.auth-buttons {
+  display: flex;
+  gap: 10px; /* Jarak antara tombol Sign Up dan Sign In */
+}
+
+/* Styling untuk tombol Sign Up */
+.signup-button {
+  background-color: #007bff; /* Ganti dengan warna yang Anda inginkan */
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Styling untuk tombol Sign In */
+.login-button {
+  background-color: #ff6600;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
