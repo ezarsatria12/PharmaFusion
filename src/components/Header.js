@@ -1,20 +1,44 @@
-import React from 'react';
-import './Header.css';
+import React from "react";
+import logo from "../assets/logo.png"; // Sesuaikan jalur file logo
+import { Link } from "react-router-dom";
+import './Header'; // Jika ada CSS global
 
 const Header = () => {
   return (
     <header className="header">
-      <div className="logo">PHARMAFUSION</div>
-      <nav className="nav-links">
-        <a href="#home">HOME</a> {/* Tambahkan tautan Home di sini */}
-        <a href="#pasien">PASIEN</a>
-        <a href="#review">REVIEW</a>
-        <a href="#team">TEAM</a>
-        <div className="auth-buttons">
-          <button className="signup-button">Sign Up</button>
-          <button className="login-button">Sign In</button>
+      <div className="header-container">
+        {/* Logo */}
+        <div className="logo-container">
+          <img src={logo} alt="PharmaFusion Logo" className="logo" />
         </div>
-      </nav>
+
+        {/* Navigation */}
+        <nav>
+          <ul>
+            <li><Link to="/">Home</Link></li> {/* Navigasi ke Home */}
+            <li><Link to="/pasien">Pasien</Link></li> 
+            <li><Link to="/review">Review</Link></li> 
+            <li><Link to="/team">Team</Link></li> {/* Navigasi ke Team */}
+            
+       
+          </ul>
+        </nav>
+
+        {/* Buttons */}
+        <div className="header-buttons">
+        <Link to="/signup">
+            <button className="btn-signup">
+              SignUp
+            </button>
+          </Link>
+          <Link to="/signin">
+            <button className="btn-signin">
+              SignIn
+            </button>
+          </Link>
+          
+        </div>
+      </div>
     </header>
   );
 };
