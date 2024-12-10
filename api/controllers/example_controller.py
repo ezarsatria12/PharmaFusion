@@ -1,26 +1,19 @@
 from flask import Flask, request, jsonify
-from api import db
-from api.models.description_model import DescriptionModel
-from tensorflow.keras.models import load_model
 import numpy as np
-import os
 import pandas as pd
+import tensorflow as tf
+import os
 
 app = Flask(__name__)
 
-# Mendapatkan path model secara absolut
-model_path = r'C:\Users\LENOVO\Documents\Project Pharmafusion\PharmaFusion\api\models\model_penyakit.h5'
+# Mendapatkan path model yang ada di folder 'models'
+model_path = os.path.join(os.path.dirname(__file__), '..', 'models', 'model_penyakit.h5')
+loaded_model = tf.keras.models.load_model(model_path)
 
-# Memuat model
-model = load_model(model_path)
+# Mendapatkan path ke file CSV yang ada di folder 'models'
+csv_file_path = os.path.join(os.path.dirname(__file__), '..', 'models', 'Training_ID.csv')
 
-# Label mapping (sesuaikan dengan output model Anda)
-label_mapping = {
-    0: "Flu_001",
-    1: "Covid-19_002",
-    2: "Dengue_003"
-}
-
+# Fungsi untuk melakukan prediksi menggunakan model
 def predict_disease(input_data):
     """Melakukan prediksi dengan model dan mengembalikan hasil."""
     try:
@@ -28,66 +21,62 @@ def predict_disease(input_data):
         input_array = np.array(input_data)
         if input_array.ndim == 1:  # Tambahkan batch dimension jika perlu
             input_array = np.expand_dims(input_array, axis=0)
-        
+
         # Melakukan prediksi
-        predictions = model.predict(input_array)
-        disease_class_id = int(np.argmax(predictions, axis=1)[0])  # ID kelas
-        probability = float(np.max(predictions, axis=1)[0])  # Probabilitas
+        predictions = loaded_model.predict(input_array)
+        predicted_class = np.argmax(predictions, axis=1)[0]  # ID kelas
+        probability = np.max(predictions, axis=1)[0]  # Probabilitas
         
-        return disease_class_id, probability
+        # Mengonversi float32 ke float untuk serialisasi JSON
+        return predicted_class, float(probability)
     except Exception as e:
         return None, {"error": f"Error in prediction: {str(e)}"}
 
-def get_example_and_prediction(disease_class_id, probability):
-    """Mengambil data yang berelasi berdasarkan ID penyakit dari database."""
-    try:
-        # Mengambil data dari database berdasarkan ID penyakit
-        example = DescriptionModel.query.filter_by(Symptomps_ID=disease_class_id).first()
-        
-        if example:
-            label = label_mapping.get(disease_class_id, "Unknown_000")
-            disease, disease_id = label.split('_')  # Pisahkan penyakit dan ID
-            
-            return {
-                "id": example.Symptomps_ID,
-                "disease": disease,
-                "description": example.Description,
-                "predicted_class_id": disease_class_id,
-                "probability": probability * 100  # Skala ke 0-100
-            }
-        else:
-            return {"error": "Data tidak ditemukan untuk ID penyakit."}
-    except Exception as e:
-        return {"error": f"Database query error: {str(e)}"}
-
 @app.route('/predict', methods=['POST'])
 def predict_example():
-    """Endpoint untuk melakukan prediksi dan mengambil data terkait."""
+    """Endpoint untuk melakukan prediksi dan menampilkan hasil."""
     try:
         # Validasi input JSON
-        if 'file' in request.files:
-            file = request.files['file']
-            try:
-                # Membaca CSV dan mengubahnya menjadi DataFrame
-                df = pd.read_csv(file)
-                input_data = df.to_numpy()
-            except Exception as e:
-                return jsonify({"error": f"Failed to process CSV file: {str(e)}"}), 400
-        else:
-            data = request.get_json()
-            input_data = data.get('features')
-            if not input_data:
-                return jsonify({"error": "Fitur input tidak ditemukan."}), 400
+        data = request.get_json()
+        input_data = data.get('features')
+        if not input_data:
+            return jsonify({"error": "Fitur input tidak ditemukan."}), 400
+
+        # Memastikan input_data dalam format yang benar
+        input_data = np.array(input_data)
+
+        # Membaca file CSV yang ada di folder 'models'
+        train_data = pd.read_csv(csv_file_path)
+
+        # Mendapatkan daftar penyakit dan ID-nya dari CSV
+        disease_labels = train_data[['Disease', 'Disease_ID']].drop_duplicates().reset_index(drop=True)
+
+        # Pemetaan langsung Disease_ID ke nama penyakit
+        disease_id_mapping = {i: str(disease_labels.loc[i, 'Disease_ID']) 
+                              for i in range(len(disease_labels))}
+        disease_name_mapping = {i: disease_labels.loc[i, 'Disease'] 
+                                for i in range(len(disease_labels))}
 
         # Melakukan prediksi
-        disease_class_id, probability = predict_disease(input_data)
+        predicted_class, probability = predict_disease(input_data)
 
         # Jika terjadi error dalam prediksi
-        if disease_class_id is None:
-            return jsonify(probability), 500
+        if predicted_class is None:
+            return jsonify({"error": "Prediksi gagal."}), 500
 
-        # Mengambil data terkait dari database
-        result = get_example_and_prediction(disease_class_id, probability)
+        # Memastikan prediksi kelas yang dipetakan ke Disease_ID yang benar
+        disease_id = disease_id_mapping.get(predicted_class, "Unknown")  # ID dimulai dari 101
+        disease = disease_name_mapping.get(predicted_class, "Unknown")
+
+        # Skala probabilitas ke persentase
+        probability_percentage = round(float(probability) * 100, 6)
+
+        # Format output sesuai dengan pengembangan AI
+        result = {
+            "Disease_ID": disease_id,
+            "penyakit": disease,
+            "probabilitas": probability_percentage
+        }
 
         return jsonify(result), 200
     except Exception as e:

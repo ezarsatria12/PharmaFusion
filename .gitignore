@@ -5,7 +5,7 @@
 /api/flaskapi
 /.pnp
 .pnp.js
-
+/backend_env
 # testing
 /coverage
 
