@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -18,11 +18,17 @@ loaded_model = tf.keras.models.load_model(model_path)
 train_data = pd.read_csv(csv_file_path)
 
 # Membuat label mapping
-if 'Combined_Label' not in train_data.columns:
-    train_data['Combined_Label'] = train_data['Disease'] + '_' + train_data['Disease_ID'].astype(str)
+train_data['Combined_Label'] = train_data['Disease'] + '_' + train_data['Disease_ID'].astype(str)
 
-disease_labels = train_data[['Disease', 'Disease_ID']].drop_duplicates()
-label_mapping = {int(row['Disease_ID']): row['Disease'] for _, row in disease_labels.iterrows()}
+# Pisahkan fitur dan label gabungan
+X = train_data.drop(columns=['Disease', 'Disease_ID', 'Combined_Label'])
+y = train_data['Combined_Label']
+
+label_encoder = LabelEncoder()
+label_encoder.fit(y)
+
+# Membuat mapping label
+label_mapping = dict(zip(label_encoder.transform(label_encoder.classes_), label_encoder.classes_))
 
 # Fungsi untuk prediksi
 def predict_disease(input_data):
@@ -32,8 +38,8 @@ def predict_disease(input_data):
             input_array = np.expand_dims(input_array, axis=0)
 
         predictions = loaded_model.predict(input_array)
-        predicted_class = int(np.argmax(predictions, axis=1)[0])  # ID kelas sebagai integer
-        probability = float(np.max(predictions, axis=1)[0] * 100)  # Skala 0-100 sebagai float
+        predicted_class = np.argmax(predictions, axis=1)[0]  # ID kelas yang diprediksi
+        probability = np.max(predictions, axis=1)[0] * 100  # Skala 0-100
 
         return predicted_class, probability
     except Exception as e:
@@ -52,20 +58,16 @@ def predict_example():
         if predicted_class is None:
             return jsonify({"error": "Prediksi gagal."}), 500
 
-        # Tambahkan offset untuk mendapatkan Disease_ID yang benar
-        disease_id = predicted_class + 101
-        
-        # Debugging untuk memastikan hasil prediksi
-        print(f"Predicted Class: {predicted_class}")
-        print(f"Disease ID: {disease_id}")
-        print(f"Probability: {probability}")
+        # Mendekode ID kelas ke label yang sesuai
+        predicted_label = label_mapping.get(predicted_class, "Unknown")
 
-        disease = label_mapping.get(disease_id, "Unknown")
+        # Pisahkan label yang mengandung 'Disease' dan 'Disease_ID'
+        disease, disease_id = predicted_label.split('_')
 
         result = {
-            "Disease_ID": str(disease_id),
+            "Disease_ID": disease_id,
             "penyakit": disease,
-            "probabilitas": round(probability, 6)  # Membulatkan hingga 6 desimal
+            "probabilitas": float(probability)  # Pastikan tipe data probabilitas adalah float
         }
 
         return jsonify(result), 200
