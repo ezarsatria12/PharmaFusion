@@ -3,6 +3,7 @@ import LoginPage from './pages/Login';
 import HomePage from "./pages/Home";
 import Navbar from "./components/blocks/Navbar";
 import PasienPage from "./pages/Pasien";
+import Footer from "./components/blocks/Footer";
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/pasien" element={<PasienPage />} />
       </Routes>
+      <Footer />
     </>
   )
 }
