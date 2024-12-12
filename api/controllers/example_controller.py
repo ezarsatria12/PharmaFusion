@@ -25,7 +25,6 @@ train_data = pd.read_csv(csv_file_path)
 # Membuat label mapping
 train_data['Combined_Label'] = train_data['Disease'] + \
     '_' + train_data['Disease_ID'].astype(str)
-
 # Pisahkan fitur dan label gabungan
 X = train_data.drop(columns=['Disease', 'Disease_ID', 'Combined_Label'])
 y = train_data['Combined_Label']
@@ -34,8 +33,7 @@ label_encoder = LabelEncoder()
 label_encoder.fit(y)
 
 # Membuat mapping label
-label_mapping = dict(zip(label_encoder.transform(
-    label_encoder.classes_), label_encoder.classes_))
+label_mapping = dict(zip(label_encoder.transform(label_encoder.classes_), label_encoder.classes_))
 
 # Fungsi untuk prediksi
 
@@ -47,8 +45,7 @@ def predict_disease(input_data):
             input_array = np.expand_dims(input_array, axis=0)
 
         predictions = loaded_model.predict(input_array)
-        predicted_class = np.argmax(predictions, axis=1)[
-                                    0]  # ID kelas yang diprediksi
+        predicted_class = np.argmax(predictions, axis=1)[0]  # ID kelas yang diprediksi
         probability = np.max(predictions, axis=1)[0] * 100  # Skala 0-100
 
         return predicted_class, probability
