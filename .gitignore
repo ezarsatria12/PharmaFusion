@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /api/flaskapi
+__pycache__
 /.pnp
 .pnp.js
 /backend_env
