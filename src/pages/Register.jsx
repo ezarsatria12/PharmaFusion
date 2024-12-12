@@ -22,14 +22,19 @@ import ilustrator from "../assets/hero-ilustrator.png"
 
 const formSchema = z.object({
   username: z.string().min(3, {
-    message: "Masukan username atau email minimal 3 karakter.",
+    message: "Username harus memiliki minimal 3 karakter.",
+  }),
+  email: z.string().email({
+    message: "Masukan email yangg valid.",
   }),
   password:
     z.string().min(8, {
-      message: "Masukan password minimal 8 karakter.",
+      message: "Panjang password minimal 8 karakter.",
+    }).regex(/^(?=.*[a-zA-Z])(?=.*\d).+$/, {
+      message: "Password harus memiliki kombinasi huruf dan angka.",
     })
 })
-export default function LoginPage() {
+export default function RegisterPage() {
   const [pwdType, setPwdType] = useState('password');
   const [eyeIcon, setEyeIcon] = useState("mdi:eye-off-outline");
 
@@ -61,24 +66,28 @@ export default function LoginPage() {
 
   return (
     <main className="flex">
-      <div className="text-white p-5 hidden flex-col items-center w-full justify-center min-h-screen bg-app lg:flex">
-        <img className="object-contain h-fit" src="/logo.png" alt="Logo" width={120} />
-        <h1 className="text-center mt-4 space text-4xl font-bold">Halo! Selamat datang di <br /> PharmaFusion</h1>
-        <p className="text-lg font-medium mt-2">Belum memiliki akun?</p>
-        <button onClick={() => navigate("/register")} className="relative mt-2 w-[160px]">
-          <img className="mx-auto" src={bg_button} width={150} />
-          <span className="absolute left-1/2 -translate-x-1/2 top-5 -translate-y-1/2 font-bold text-xl">Sign Up</span>
-        </button>
-        <img src={ilustrator} width={300} />
-      </div>
-
       <div className="relative flex flex-col w-full min-h-screen p-5 gap-4 bg-[#E7DED8] justify-center">
         <img className="absolute bottom-0 left-0" src={bg_accent} width={360} />
         <img className="absolute top-0 right-0 rotate-180" src={bg_accent} width={360} />
         <img className="absolute top-5" src="/logo.png" alt="Logo" width={120} />
-        <h1 className="z-10 text-3xl font-bold text-app text-center">Sign In</h1>
+        <h1 className="z-10 text-3xl font-bold text-app text-center">Sign Up</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="z-10 mx-auto w-full max-w-96 flex flex-col gap-4 text-app">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="relative">
+                      <Icon className="absolute left-3 top-1/2 -translate-y-1/2 " icon="mdi:email-outline" width="24" height="24" />
+                      <Input type="" className="pl-11 bg-gray-200 shadow-md" placeholder="Email" {...field} />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="username"
@@ -87,7 +96,7 @@ export default function LoginPage() {
                   <FormControl>
                     <div className="relative">
                       <Icon className="absolute left-3 top-1/2 -translate-y-1/2 " icon="ic:round-person" width="24" height="24" />
-                      <Input type="text" className="pl-11 bg-gray-200 shadow-md" placeholder="Email atau username" {...field} />
+                      <Input type="text" className="pl-11 bg-gray-200 shadow-md" placeholder="Username" {...field} />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -106,18 +115,39 @@ export default function LoginPage() {
                       <Icon onClick={() => handlePwdToggle()} className="absolute right-3 top-1/2 -translate-y-1/2  cursor-pointer hover:bg-gray-300 rounded" icon={eyeIcon} width="20" height="20" />
                     </div>
                   </FormControl>
-                  <FormDescription className="flex justify-end">
-                    <Link className="">Lupa Password?</Link>
+                  <FormDescription className="text-xs">
+                    Gunakan minimal 8 karakter dengan kombinasi huruf dan angka
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Sign In</Button>
-            <p className="text-sm text-center text-gray-600">Belum Punya? <Link className="text-app" to="/register">Sign Up</Link></p>
+            <Button type="submit">Submit</Button>
+            <p className="text-sm text-center text-gray-600">Sudah punya akun? <Link className="text-app" to="/login">Sign In</Link></p>
           </form>
         </Form>
-
+        <div className="z-10 mx-auto w-full max-w-96 flex flex-col gap-4">
+          <hr className="border-gray-300" />
+          <p className="text-center">Atau</p>
+          <Button className="bg-white bg-transparent border border-gray-400 hover:bg-gray-50 hover:bg-opacity-20" variant="secondary" >
+            <Icon icon="logos:google-icon" width="24" height="24" />
+            Sign Up with Google
+          </Button>
+          <Button className="bg-white bg-transparent border border-gray-400 hover:bg-gray-50 hover:bg-opacity-20" variant="secondary" >
+            <Icon icon="logos:facebook" width="26" height="26" />
+            Sign Up with Facebook
+          </Button>
+        </div>
+      </div>
+      <div className="text-white p-5 hidden flex-col items-center w-full min-h-screen justify-center bg-app lg:flex">
+        <img className="object-contain h-fit" src="/logo.png" alt="Logo" width={120} />
+        <h1 className="text-center mt-4 space text-4xl font-bold">Halo! Selamat datang di <br /> PharmaFusion</h1>
+        <p className="text-lg font-medium mt-2">Jika sudah memiliki akun</p>
+        <button onClick={() => navigate("/login")} className="relative mt-2">
+          <img src={bg_button} width={150} />
+          <span className="absolute left-1/2 -translate-x-1/2 top-5 -translate-y-1/2 font-bold text-xl">Sign In</span>
+        </button>
+        <img src={ilustrator} width={300} />
       </div>
     </main>
   )

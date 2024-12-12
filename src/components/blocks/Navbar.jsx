@@ -1,13 +1,13 @@
 import logo from "/logo.png"
 import { Button } from "@/components/ui/button"
-import { Link, NavLink, useLocation } from "react-router"
+import { Link, NavLink, useLocation, useNavigate } from "react-router"
 import { useEffect, useState } from "react"
 
 export default function Navbar() {
     const location = useLocation()
+    const navigate = useNavigate()
 
     const [isScrolled, setIsScrolled] = useState(false)
-    console.log(isScrolled);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -53,8 +53,8 @@ export default function Navbar() {
                     </NavLink>
                 </nav>
                 <div className="flex gap-3">
-                    <Button className="bg-transparent border-white text-white hover:bg-white hover:text-app" variant="outline" size="sm">Sign Up</Button>
-                    <Button className="bg-[#FB773C] hover:bg-white hover:text-app" size="sm">Sign In</Button>
+                    <Button onClick={() => navigate("/register")} className="bg-transparent border-white text-white hover:bg-white hover:text-app" variant="outline" size="sm">Sign Up</Button>
+                    <Button onClick={() => navigate("/login")} className="bg-[#FB773C] hover:bg-white hover:text-app" size="sm">Sign In</Button>
                 </div>
             </div>
         </header >
