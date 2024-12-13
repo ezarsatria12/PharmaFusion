@@ -36,6 +36,10 @@ export default function Sidebar({ children }) {
                         Setting
                     </NavLink>
                 </nav>
+                <button className="px-5 absolute bottom-8 font-medium flex gap-2 items-center">
+                    <Icon icon="fa-solid:power-off" />
+                    <span>Logout</span>
+                </button>
             </aside>
             {children}
         </div>
