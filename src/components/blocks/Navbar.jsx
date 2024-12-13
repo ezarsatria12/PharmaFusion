@@ -21,7 +21,7 @@ export default function Navbar() {
     }, [isScrolled])
 
     return (
-        <header className={`${location.pathname === "/" && isScrolled ? "bg-app" : location.pathname != "/" ? "bg-app" : "bg-opacity-0"}  z-50  w-full top-0 fixed h-20 flex justify-between items-center px-10 transition duration-200`}>
+        <header className={`${["/", "/review"].includes(location.pathname) && isScrolled ? "bg-app" : !["/", "/team", "/review"].includes(location.pathname) ? "bg-app" : "bg-opacity-0"}  z-50  w-full top-0 fixed h-20 flex justify-between items-center px-10 transition duration-200`}>
             <Link to={"/"}>
                 <img src={logo} alt="Logo" />
             </Link>

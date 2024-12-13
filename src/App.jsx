@@ -8,11 +8,12 @@ import { useLocation } from "react-router-dom";
 import RegisterPage from "./pages/Register";
 import UserSetting from "./pages/UserSetting";
 import Sidebar from "./components/blocks/Sidebar";
-import Team from "./pages/Team";
+import TeamPage from "./pages/Team";
+import ReviewPage from "./pages/Review";
 
 function App() {
   const location = useLocation();
-  const showNavbarFooter = ["/", "/team"].includes(location.pathname);
+  const showNavbarFooter = ["/", "/team", "/review"].includes(location.pathname);
   const showSidebar = ["/pasien", "/user-setting"].includes(location.pathname);
 
   return (
@@ -28,7 +29,8 @@ function App() {
       }
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/team" element={<Team />} />
+        <Route path="/team" element={<TeamPage />} />
+        <Route path="/review" element={<ReviewPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
       </Routes>
