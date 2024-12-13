@@ -104,7 +104,7 @@ export default function HasilDiagnosa() {
                                     <FormControl>
                                         <div className="relative">
                                             <Icon className="absolute left-3 top-1/2 -translate-y-1/2 " icon="ic:round-person" width="24" height="24" />
-                                            <Input type="text" className="pl-11 bg-gray-200 shadow-md" placeholder="Email atau username" {...field} />
+                                            <Input type="text" className="pl-11 bg-gray-200 shadow-md" placeholder="Username" {...field} />
                                         </div>
                                     </FormControl>
                                     <FormMessage />
@@ -119,7 +119,7 @@ export default function HasilDiagnosa() {
                                     <FormControl>
                                         <div className="relative">
                                             <Icon className="absolute left-3 top-1/2 -translate-y-1/2 " icon="mdi:email-outline" width="23" height="23" />
-                                            <Input type="email" className="pl-11 pr-10 bg-gray-200 shadow-md" placeholder="Password" {...field} />
+                                            <Input type="email" className="pl-11 pr-10 bg-gray-200 shadow-md" placeholder="Masukan email anda" {...field} />
                                         </div>
                                     </FormControl>
                                     <FormMessage />

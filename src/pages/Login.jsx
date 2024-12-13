@@ -107,7 +107,7 @@ export default function LoginPage() {
                     </div>
                   </FormControl>
                   <FormDescription className="flex justify-end">
-                    <Link className="">Lupa Password?</Link>
+                    <Link to={"/reset-password"} className="">Lupa Password?</Link>
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

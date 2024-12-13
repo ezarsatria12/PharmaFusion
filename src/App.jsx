@@ -10,6 +10,7 @@ import UserSetting from "./pages/UserSetting";
 import Sidebar from "./components/blocks/Sidebar";
 import TeamPage from "./pages/Team";
 import ReviewPage from "./pages/Review";
+import ResetPasswordPage from "./pages/ResetPassword";
 
 function App() {
   const location = useLocation();
@@ -33,6 +34,7 @@ function App() {
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Routes>
       {showNavbarFooter && <Footer />}
     </>

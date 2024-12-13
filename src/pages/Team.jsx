@@ -66,7 +66,7 @@ export default function Team() {
                                         <img
                                             src={person.image}
                                             alt="team"
-                                            className="rounded-md"
+                                            className="rounded-md w-full aspect-square object-cover"
                                         />
                                         <h1 className="font-semibold mt-2 text-lg text-center">{person.name}</h1>
                                         <p className="text-center">{person.role}</p>
