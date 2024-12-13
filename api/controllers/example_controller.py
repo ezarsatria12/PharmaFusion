@@ -4,8 +4,10 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import os
-from sqlalchemy.sql import text
-from api.models.description_model import DescriptionModel  # Model database
+from api.models.symptomps_model import SymptompsModel  # Model Symptomps
+from api.models.medicines_model import MedicinesModel  # Model Medicine
+from api.models.precautions_model import PrecautionsModel  # Model Precaution
+from api.models.description_model import DescriptionModel
 from api import db  # Instance database
 
 app = Flask(__name__)
@@ -36,8 +38,6 @@ label_encoder.fit(y)
 label_mapping = dict(zip(label_encoder.transform(label_encoder.classes_), label_encoder.classes_))
 
 # Fungsi untuk prediksi
-
-
 def predict_disease(input_data):
     try:
         input_array = np.array(input_data)
@@ -51,7 +51,6 @@ def predict_disease(input_data):
         return predicted_class, probability
     except Exception as e:
         return None, f"Error in prediction: {str(e)}"
-
 
 @app.route('/predict', methods=['POST'])
 def predict_example():
@@ -70,33 +69,40 @@ def predict_example():
         predicted_label = label_mapping.get(predicted_class, "Unknown")
         disease, disease_id = predicted_label.split('_')
 
-        # Query data dari tabel symptomps berdasarkan Disease_ID
-        query = text("SELECT * FROM symptomps WHERE ID = :id")
-        symptomps_data = db.session.execute(query, {"id": int(disease_id)}).fetchone()
+        # Query menggunakan SQLAlchemy
+        symptomps_data = SymptompsModel.query.get(int(disease_id))
+        description_data = DescriptionModel.query.filter_by(Symptomps_ID=int(disease_id)).first()
 
+        # Jika symptomps_data ditemukan
         if symptomps_data:
-            # Cek jika symptomps_data memiliki kolom (keys) dan buat dictionary
-            symptomps_data_dict = {col: val for col, val in zip(symptomps_data.keys(), symptomps_data)}
-
             symptoms = [
-                symptomps_data_dict[column]
-                for column in symptomps_data_dict if column.startswith('Symptomps_') and symptomps_data_dict[column]
+                getattr(symptomps_data, f"Symptomps_{i}")
+                for i in range(1, 18) if getattr(symptomps_data, f"Symptomps_{i}")
             ]
 
-            medicines = ["Obat A", "Obat B"]
+            medicines = MedicinesModel.query.filter_by(Symptomps_ID=int(disease_id)).all()
+            medicines_data = [
+                {"name": med.Medicine_Name, "description": med.Medicine_Description}
+                for med in medicines
+            ]
+
+            precautions = PrecautionsModel.query.filter_by(Symptomps_ID=int(disease_id)).first()
+            precautions_data = [
+                getattr(precautions, f"Precaution_{i}")
+                for i in range(1, 5) if getattr(precautions, f"Precaution_{i}")
+            ] if precautions else []
+
+            # Ambil deskripsi jika tersedia
+            description_text = description_data.Description if description_data else "Tidak tersedia"
 
             result = {
                 "Disease_ID": disease_id,
                 "penyakit": disease,
                 "probabilitas": float(probability),
-                "description": symptomps_data_dict.get('Disease', "Tidak tersedia"),
+                "description": description_text,
                 "symptoms": symptoms,
-                "medicines": medicines,
-                "additional_info": {
-                    "treatment": symptomps_data_dict.get('Treatment', "Tidak tersedia"),
-                    "precautions": symptomps_data_dict.get('Precautions', "Tidak tersedia"),
-                    "severity": symptomps_data_dict.get('Severity', "Tidak tersedia"),
-                }
+                "medicines": medicines_data,
+                "precautions": precautions_data
             }
         else:
             result = {
@@ -105,7 +111,8 @@ def predict_example():
                 "probabilitas": float(probability),
                 "description": "Data tidak ditemukan di database.",
                 "symptoms": [],
-                "medicines": []
+                "medicines": [],
+                "precautions": []
             }
 
         return jsonify(result), 200
