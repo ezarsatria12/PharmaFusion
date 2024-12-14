@@ -1,7 +1,15 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
+import { useAuth } from "@/utils/AuthProvider";
 
 export default function Sidebar({ children }) {
+    const { logout } = useAuth()
+    const navigate = useNavigate()
+    const handleSignOut = () => {
+        logout()
+        navigate("/login", { replace: true });
+    }
+
     return (
         <div className="flex">
             <aside className="bg-app h-screen w-48 py-5 text-white fixed">
@@ -36,7 +44,7 @@ export default function Sidebar({ children }) {
                         Setting
                     </NavLink>
                 </nav>
-                <button className="px-5 absolute bottom-8 font-medium flex gap-2 items-center">
+                <button onClick={() => handleSignOut()} className="px-5 absolute bottom-8 font-medium flex gap-2 items-center">
                     <Icon icon="fa-solid:power-off" />
                     <span>Logout</span>
                 </button>
