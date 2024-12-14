@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import os
+from sqlalchemy.sql import text
 from api.models.symptomps_model import SymptompsModel  # Model Symptomps
 from api.models.medicines_model import MedicinesModel  # Model Medicine
 from api.models.precautions_model import PrecautionsModel  # Model Precaution
@@ -60,14 +61,34 @@ def predict_example():
         if not input_data:
             return jsonify({"error": "Fitur input tidak ditemukan."}), 400
 
+        # Simpan input pengguna ke tabel Symptoms_input
+        db.session.execute(
+            text("""
+                INSERT INTO Symptoms_input (features) VALUES (:features)
+            """),
+            {"features": str(input_data)}
+        )
+        db.session.commit()
+
+        # Dapatkan ID input terakhir
+        input_id = db.session.execute(text("SELECT LAST_INSERT_ID() as id")).fetchone().id
+
+        # Prediksi penyakit berdasarkan fitur
         predicted_class, probability = predict_disease(input_data)
 
         if predicted_class is None:
             return jsonify({"error": "Prediksi gagal."}), 500
 
         # Mendekode ID kelas ke label yang sesuai
-        predicted_label = label_mapping.get(predicted_class, "Unknown")
-        disease, disease_id = predicted_label.split('_')
+        predicted_label = label_mapping.get(predicted_class, None)
+        if not predicted_label:
+            return jsonify({"error": "Label prediksi tidak ditemukan."}), 500
+
+        # Split label menjadi penyakit dan ID
+        try:
+            disease, disease_id = predicted_label.split('_')
+        except ValueError:
+            return jsonify({"error": "Format label prediksi tidak valid."}), 500
 
         # Query menggunakan SQLAlchemy
         symptomps_data = SymptompsModel.query.get(int(disease_id))
@@ -95,7 +116,27 @@ def predict_example():
             # Ambil deskripsi jika tersedia
             description_text = description_data.Description if description_data else "Tidak tersedia"
 
+            # Simpan hasil prediksi ke tabel user_prediction
+            db.session.execute(
+                text("""
+                    INSERT INTO user_prediction (Disease_ID, Disease, Symptoms_input, Probabilitas)
+                    VALUES (:disease_id, :disease, :symptoms_input, :probabilitas)
+                """),
+                {
+                    "disease_id": int(disease_id),  # Kolom Disease_ID
+                    "disease": disease,  # Kolom Disease (isi dengan nama penyakit)
+                    "symptoms_input": input_id,  # Kolom Symptoms_input (isi dengan ID input yang disimpan sebelumnya)
+                    "probabilitas": float(probability)  # Kolom Probabilitas (isi dengan probabilitas prediksi)
+                }
+            )
+
+            db.session.commit()
+
+            # Dapatkan ID prediksi terakhir
+            prediction_id = db.session.execute(text("SELECT LAST_INSERT_ID() as id")).fetchone().id
+
             result = {
+                "user_prediction_id": prediction_id,
                 "Disease_ID": disease_id,
                 "penyakit": disease,
                 "probabilitas": float(probability),
@@ -105,6 +146,7 @@ def predict_example():
                 "precautions": precautions_data
             }
         else:
+            db.session.rollback()
             result = {
                 "Disease_ID": disease_id,
                 "penyakit": disease,
@@ -117,4 +159,5 @@ def predict_example():
 
         return jsonify(result), 200
     except Exception as e:
+        db.session.rollback()
         return jsonify({"error": f"Unexpected server error: {str(e)}"}), 500
