@@ -12,14 +12,44 @@ import { useAuth } from "@/utils/AuthProvider";
 const user = {
     name: "John Doe",
     imageUrl: ""
-}
+};
 
 export default function PasienPage() {
     const [tab, setTab] = useState("1");
     const { user } = useAuth();
 
+    const [predictedResult, setPredictedResult] = useState(null); // State untuk menyimpan hasil prediksi
+
+
     const getInitial = (name) => {
         return name ? name.charAt(0).toUpperCase() : '';
+    };
+
+    const handlePrediction = async (symptoms) => {
+        // Fungsi untuk mengirim data ke API prediksi
+        const symptomOrder = ["itching", "skin_rash", "nodal_skin_eruptions", "continuous_sneezing", "shivering", /* ...other symptoms... */ "fluid_overload.1"];
+
+        const sortSymptoms = (symptoms) => {
+            return symptomOrder.map((key) => symptoms[key] ?? null);
+        };
+
+        const sortedSymptoms = sortSymptoms(symptoms);
+
+        try {
+            const response = await fetch("/api/predict", {
+                method: "POST",
+                body: JSON.stringify({ data: sortedSymptoms }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const result = await response.json();
+            setPredictedResult(result); // Simpan hasil prediksi
+            setTab("3"); // Pindah ke tab hasil diagnosa
+        } catch (error) {
+            console.error("Prediction failed:", error);
+        }
     };
 
     return (
@@ -34,22 +64,24 @@ export default function PasienPage() {
                         }
                     </Avatar>
                 </header>
-                {
-                    tab == '1' && (
-                        <FormDataMedis getValues={(val) => console.log(val)} onNext={(tab) => setTab(tab)} />
-                    )
-                }
-                {
-                    tab == '2' && (
-                        <FormKeluhan getValues={(val) => console.log(val)} onNext={(tab) => setTab(tab)} />
-                    )
-                }
-                {
-                    tab == '3' && (
-                        <HasilDiagnosa />
-                    )
-                }
+
+                {/* Tab Navigasi */}
+                {tab === '1' && (
+                    <FormDataMedis
+                        getValues={(val) => console.log(val)}
+                        onNext={(nextTab) => setTab(nextTab)}
+                    />
+                )}
+                {tab === '2' && (
+                    <FormKeluhan
+                        getValues={(val) => console.log(val)}
+                        onNext={(symptoms) => handlePrediction(symptoms)} // Kirim ke API dan pindah tab
+                    />
+                )}
+                {tab === '3' && (
+                    <HasilDiagnosa result={predictedResult} />
+                )}
             </div>
         </main>
-    )
+    );
 }
