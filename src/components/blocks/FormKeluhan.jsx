@@ -15,33 +15,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 
-const gejalaKulit = [
-    { id: "1", label: "Gatal" },
-    { id: "2", label: "Ruam Kulit" },
-    { id: "3", label: "Bentuk noda atau erupsi pada kulit" },
-    { id: "4", label: "Bercak dischromic" },
-    { id: "5", label: "Kulit mengelupas" },
-    { id: "6", label: "Bekas luka" },
-    { id: "7", label: "Bercak merah di tubuh" },
-    { id: "8", label: "Jerawat bernanah" },
-    { id: "9", label: "Lapisan seperti perak" },
-    { id: "10", label: "Bercak merah di sekitar hidung" },
-    { id: "11", label: "Keluarnya nanah dari kulit" },
-    { id: "12", label: "Noda seperti debu perak" },
-    { id: "13", label: "Luka melepuh" },
-    { id: "14", label: "Luka bernanah" },
-    { id: "15", label: "Pus filled pimples" },
-    { id: "16", label: "Blackheads" },
-    { id: "17", label: "Scarring" },
-    { id: "18", label: "Skin peeling" },
-    { id: "19", label: "Silver-like dusting" },
-    { id: "20", label: "Small dents in nails" },
-    { id: "21", label: "Inflammatory nails" },
-    { id: "22", label: "Blister" },
-    { id: "23", label: "Red sore around nose" },
-    { id: "24", label: "Yellow crust ooze" },
-];
-
 const keluhan = [
     { id: "gatal", name: "Gatal" },
     { id: "ruam_kulit", name: "Ruam Kulit" },
@@ -193,10 +166,14 @@ export default function FormKeluhan({ getValues, onNext }) {
         }
     })
 
+    function mapToBinarySelection(gejala, selectedGejala) {
+        return gejala.map((item) => selectedGejala.includes(item.id) ? 1 : 0);
+    }
     function onSubmit(data) {
-        getValues(data);
-        // console.log(data);
-        onNext("3");
+        const transformedData = [
+            ...mapToBinarySelection(keluhan, data.keluhan),
+        ];
+        onNext(transformedData);
     }
 
     return (

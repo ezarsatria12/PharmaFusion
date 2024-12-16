@@ -10,6 +10,8 @@ import fotokurnia from '@/assets/foto/kurnia.jpg'
 import fototria from '@/assets/foto/tria.jpg'
 import fotopuji from '@/assets/foto/puji.jpg'
 import fotonadia from '@/assets/foto/nadia.jpg'
+import fotoezar from '@/assets/foto/ezar.jpg'
+import fotoiqro from '@/assets/foto/iqro.jpg'
 
 const team = [
     {
@@ -28,7 +30,7 @@ const team = [
         name: "Ezar Satria Permana",
         role: "Machine Learning",
         instagram: "Ezar",
-        image: "https://github.com/ezar.png"
+        image: fotoezar
     },
     {
         name: "Kurnia Anggie Oktriana",
@@ -46,7 +48,7 @@ const team = [
         name: "Iqra Manaqibal Atqiya",
         role: "Backend Developer",
         instagram: "iqra",
-        image: "https://github.com/iqra.png"
+        image: fotoiqro
     },
 ]
 
@@ -70,7 +72,7 @@ export default function Team() {
                                         <img
                                             src={person.image}
                                             alt="team"
-                                            className="rounded-md w-full aspect-square object-cover"
+                                            className="rounded-md w-full aspect-square object-cover max-h-64"
                                         />
                                         <h1 className="font-semibold mt-2 text-lg text-center">{person.name}</h1>
                                         <p className="text-center">{person.role}</p>
