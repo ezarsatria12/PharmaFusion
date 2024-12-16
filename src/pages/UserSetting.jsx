@@ -5,17 +5,13 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { Textarea } from "@/components/ui/textarea";
-
-const user = {
-    username: "shadcn",
-    fullName: "Shadiq Al Kubaisy",
-    picture: "https://github.com/shadcn.png",
-    email: "shad@gmail.com",
-    bio: "Perawat handal yang suka menulis dan berbagi pengetahuan",
-}
+import { useAuth } from "@/utils/AuthProvider";
 
 export default function UserSetting() {
+    const { user: authUser } = useAuth();
+
     const [file, setFile] = useState(null);
+    const [user, setUser] = useState(authUser);
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -30,6 +26,10 @@ export default function UserSetting() {
         const data = Object.fromEntries(formData.entries());
         console.log(data);
     }
+    const handleOnChange = (event) => {
+        const { name, value } = event.target;
+        setUser((prev) => ({ ...prev, [name]: value }));
+    }
 
     return (
         <main className="w-full flex bg-app p-4 min-h-screen ">
@@ -38,8 +38,8 @@ export default function UserSetting() {
                 <form onSubmit={handleSubmit} className="mt-10">
                     <div className="flex gap-5 items-center">
                         <Avatar className="w-32">
-                            <AvatarImage src={file ? file : "https://github.com/shadcn.png"} alt="@shadcn" />
-                            <AvatarFallback>CN</AvatarFallback>
+                            <AvatarImage src={file ? file : user?.image} />
+                            <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div>
                             <Label htmlFor="picture">Foto Profil</Label>
@@ -62,19 +62,19 @@ export default function UserSetting() {
                     </div>
                     <div className="mt-10">
                         <Label htmlFor="full-name">Nama Lengkap</Label>
-                        <Input className="mt-1 shadow" id="full-name" type="text" name="fullName" value={user.fullName || ""} />
+                        <Input className="mt-1 shadow" id="full-name" type="text" name="fullName" onChange={handleOnChange} value={user?.firstName || ""} />
                     </div>
                     <div className="mt-5">
                         <Label htmlFor="username">Username</Label>
-                        <Input className="mt-1 shadow" id="username" type="text" name="username" value={user.username || ""} />
+                        <Input className="mt-1 shadow" id="username" type="text" name="username" onChange={handleOnChange} value={user?.username || ""} />
                     </div>
                     <div className="mt-5">
                         <Label htmlFor="email">Email</Label>
-                        <Input className="mt-1 shadow" id="email" type="email" name="email" value={user.email || ""} />
+                        <Input className="mt-1 shadow" id="email" type="email" name="email" onChange={handleOnChange} value={user?.email || ""} />
                     </div>
                     <div className="mt-5">
                         <Label htmlFor="bio">Tentang saya</Label>
-                        <Textarea className="mt-1 shadow" id="bio" type="email" name="bio" value={user.bio || ""} />
+                        <Textarea className="mt-1 shadow" id="bio" type="email" name="bio" onChange={handleOnChange} value={user?.bio || ""} />
                     </div>
                     <div className="mt-10 flex justify-end">
                         <Button type="submit">Simpan</Button>

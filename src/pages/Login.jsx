@@ -14,25 +14,29 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Icon } from "@iconify/react"
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Link, Navigate, useNavigate } from "react-router-dom"
 import bg_accent from "../assets/hero-bg-accent.svg"
 import bg_button from "../assets/bg-button-accent.svg"
 import ilustrator from "../assets/hero-ilustrator.png"
+import { useAuth } from "@/utils/AuthProvider"
+import { Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 const formSchema = z.object({
   username: z.string().min(3, {
     message: "Masukan username atau email minimal 3 karakter.",
   }),
   password:
-    z.string().min(8, {
-      message: "Masukan password minimal 8 karakter.",
-    })
+    z.string()
 })
 export default function LoginPage() {
   const [pwdType, setPwdType] = useState('password');
   const [eyeIcon, setEyeIcon] = useState("mdi:eye-off-outline");
+  const { login } = useAuth()
+  const [loading, setLoading] = useState(false)
 
+  const { toast } = useToast()
   const navigate = useNavigate()
 
   const form = useForm({
@@ -43,10 +47,42 @@ export default function LoginPage() {
       password: "",
     },
   })
-  function onSubmit(values) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+  async function onSubmit(values) {
+    try {
+      setLoading(true)
+      // Dummy Login, ganti dedngan api login yang sudah dibuat dan sesuaikan untuk response dan requestnya
+      const response = await fetch('https://dummyjson.com/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values)
+      })
+      if (response.ok) {
+        const data = await response.json()
+        console.log(data);
+        login(data.accessToken)
+      } else if (response.status === 400) {
+        toast({
+          variant: "destructive",
+          title: "Login Gagal",
+          description: "Username atau Password salah.",
+        })
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Login Gagal",
+          description: "Terjadi kesalahan, silahkan coba lagi.",
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      toast({
+        variant: "destructive",
+        title: "Login Gagal",
+        description: "Terjadi kesalahan, silahkan coba lagi.",
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handlePwdToggle = () => {
@@ -59,13 +95,19 @@ export default function LoginPage() {
     }
   }
 
+  const { isAuthenticated } = useAuth()
+
+  if (isAuthenticated) {
+    return <Navigate to="/pasien" replace />
+  }
+
   return (
     <main className="flex">
       <div className="text-white p-5 hidden flex-col items-center w-full justify-center min-h-screen bg-app lg:flex">
         <img className="object-contain h-fit" src="/logo.png" alt="Logo" width={120} />
         <h1 className="text-center mt-4 space text-4xl font-bold">Halo! Selamat datang di <br /> PharmaFusion</h1>
         <p className="text-lg font-medium mt-2">Belum memiliki akun?</p>
-        <button onClick={() => navigate("/register")} className="relative mt-2 w-[160px]">
+        <button onClick={() => navigate("/register", { replace: true })} className="relative mt-2 w-[160px]">
           <img className="mx-auto" src={bg_button} width={150} />
           <span className="absolute left-1/2 -translate-x-1/2 top-5 -translate-y-1/2 font-bold text-xl">Sign Up</span>
         </button>
@@ -113,8 +155,13 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Sign In</Button>
-            <p className="text-sm text-center text-gray-600">Belum Punya? <Link className="text-app" to="/register">Sign Up</Link></p>
+            <Button type="submit" disabled={loading}>
+              {
+                loading && <Loader2 className="animate-spin" />
+              }
+              Sign In
+            </Button>
+            <p className="text-sm text-center text-gray-600">Belum Punya? <Link className="text-app" to="/register" replace>Sign Up</Link></p>
           </form>
         </Form>
 

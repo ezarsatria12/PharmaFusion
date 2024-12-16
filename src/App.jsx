@@ -11,6 +11,9 @@ import Sidebar from "./components/blocks/Sidebar";
 import TeamPage from "./pages/Team";
 import ReviewPage from "./pages/Review";
 import ResetPasswordPage from "./pages/ResetPassword";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import { AuthProvider } from "./utils/AuthProvider";
+import { Toaster } from "@/components/ui/toaster"
 
 function App() {
   const location = useLocation();
@@ -18,13 +21,15 @@ function App() {
   const showSidebar = ["/pasien", "/user-setting"].includes(location.pathname);
 
   return (
-    <>
+    <AuthProvider>
       {showNavbarFooter && <Navbar />}
       {showSidebar &&
         <Sidebar>
           <Routes>
-            <Route path="/pasien" element={<PasienPage />} />
-            <Route path="/user-setting" element={<UserSetting />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/pasien" element={<PasienPage />} />
+              <Route path="/user-setting" element={<UserSetting />} />
+            </Route>
           </Routes>
         </Sidebar>
       }
@@ -37,7 +42,8 @@ function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Routes>
       {showNavbarFooter && <Footer />}
-    </>
+      <Toaster />
+    </AuthProvider>
   )
 }
 
