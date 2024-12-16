@@ -6,19 +6,23 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel"
 import { Icon } from "@iconify/react";
+import fotokurnia from '@/assets/foto/kurnia.jpg'
+import fototria from '@/assets/foto/tria.jpg'
+import fotopuji from '@/assets/foto/puji.jpg'
+import fotonadia from '@/assets/foto/nadia.jpg'
 
 const team = [
     {
         name: "Tria Novitri",
         role: "Writer",
         instagram: "tria",
-        image: "https://github.com/tria.png"
+        image: fototria
     },
     {
         name: "Puji Rachmawati",
         role: "Data Engineer",
         instagram: "puji",
-        image: "https://github.com/puji.png"
+        image: fotopuji
     },
     {
         name: "Ezar Satria Permana",
@@ -30,13 +34,13 @@ const team = [
         name: "Kurnia Anggie Oktriana",
         role: "UI/UX Designer",
         instagram: "kurnia",
-        image: "https://github.com/kurnia.png"
+        image: fotokurnia
     },
     {
         name: "Nadia Nur Ismalia",
         role: "Frontend Developer",
         instagram: "nadia",
-        image: "https://github.com/nadianurismalia.png"
+        image: fotonadia
     },
     {
         name: "Iqra Manaqibal Atqiya",
