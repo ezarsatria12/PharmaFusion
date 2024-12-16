@@ -252,9 +252,6 @@ const gejalaLain = [
     }
 ]
 
-
-
-
 const FormSchema = z.object({
     gejalaKulit: z.string().array().optional(),
     gejalaPernapasan: z.string().array().optional(),
