@@ -28,6 +28,7 @@ train_data = pd.read_csv(csv_file_path)
 # Membuat label mapping
 train_data['Combined_Label'] = train_data['Disease'] + \
     '_' + train_data['Disease_ID'].astype(str)
+    
 # Pisahkan fitur dan label gabungan
 X = train_data.drop(columns=['Disease', 'Disease_ID', 'Combined_Label'])
 y = train_data['Combined_Label']
