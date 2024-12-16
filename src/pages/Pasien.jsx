@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import FormDataMedis from "@/components/blocks/FormDataMedis";
 import FormKeluhan from "@/components/blocks/FormKeluhan";
 import HasilDiagnosa from "@/components/blocks/HasilDiagnosa";
+import axios from 'axios';
 
 const user = {
     name: "John Doe",
@@ -14,7 +15,7 @@ const user = {
 };
 
 export default function PasienPage() {
-    const [tab, setTab] = useState("1"); // Tab state untuk navigasi
+    const [tab, setTab] = useState("2"); // Tab state untuk navigasi
     const [predictedResult, setPredictedResult] = useState(null); // State untuk menyimpan hasil prediksi
 
     const getInitial = (name) => {
@@ -22,31 +23,24 @@ export default function PasienPage() {
     };
 
     const handlePrediction = async (symptoms) => {
-        // Fungsi untuk mengirim data ke API prediksi
-        const symptomOrder = ["itching", "skin_rash", "nodal_skin_eruptions", "continuous_sneezing", "shivering", /* ...other symptoms... */ "fluid_overload.1"];
+    // Fungsi untuk mengirim data ke API prediksi
+    try {
+        // Menggunakan axios untuk mengirim permintaan POST
+        const response = await axios.post("http://127.0.0.1:5000/api/predict", {
+            features: symptoms
+        }, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
 
-        const sortSymptoms = (symptoms) => {
-            return symptomOrder.map((key) => symptoms[key] ?? null);
-        };
-
-        const sortedSymptoms = sortSymptoms(symptoms);
-
-        try {
-            const response = await fetch("/api/predict", {
-                method: "POST",
-                body: JSON.stringify({ data: sortedSymptoms }),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-
-            const result = await response.json();
-            setPredictedResult(result); // Simpan hasil prediksi
-            setTab("3"); // Pindah ke tab hasil diagnosa
-        } catch (error) {
-            console.error("Prediction failed:", error);
-        }
-    };
+        // Menyimpan hasil prediksi
+        setPredictedResult(response.data); // response.data berisi data hasil dari API
+        setTab("3"); // Pindah ke tab hasil diagnosa
+    } catch (error) {
+        console.error("Prediction failed:", error);
+    }
+};
 
     return (
         <main className="w-full flex bg-app p-4 min-h-screen">

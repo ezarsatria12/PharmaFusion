@@ -10,8 +10,10 @@ from api.models.medicines_model import MedicinesModel  # Model Medicine
 from api.models.precautions_model import PrecautionsModel  # Model Precaution
 from api.models.description_model import DescriptionModel
 from api import db  # Instance database
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Path untuk model dan dataset
 model_path = os.path.join(os.path.dirname(
@@ -121,16 +123,15 @@ def predict_example():
             db.session.execute(
                 text("""
                     INSERT INTO user_prediction (Disease_ID, Disease, Symptoms_input, Probabilitas)
-                    VALUES (:disease_id, :disease, :symptoms_input, :probabilitas)
+                    VALUES (:Disease_ID, :Disease, :Symptoms_input, :Probabilitas)
                 """),
                 {
-                    "disease_id": int(disease_id),  # Kolom Disease_ID
-                    "disease": disease,  # Kolom Disease (isi dengan nama penyakit)
-                    "symptoms_input": input_id,  # Kolom Symptoms_input (isi dengan ID input yang disimpan sebelumnya)
-                    "probabilitas": float(probability)  # Kolom Probabilitas (isi dengan probabilitas prediksi)
+                    "Disease_ID": int(disease_id),  # Kolom Disease_ID
+                    "Disease": disease,  # Kolom Disease (isi dengan nama penyakit)
+                    "Symptoms_input": input_id,  # Kolom Symptoms_input (isi dengan ID input yang disimpan sebelumnya)
+                    "Probabilitas": float(probability)  # Kolom Probabilitas (isi dengan probabilitas prediksi)
                 }
             )
-
             db.session.commit()
 
             # Dapatkan ID prediksi terakhir
@@ -142,7 +143,6 @@ def predict_example():
                 "penyakit": disease,
                 "probabilitas": float(probability),
                 "description": description_text,
-                "symptoms": symptoms,
                 "medicines": medicines_data,
                 "precautions": precautions_data
             }
