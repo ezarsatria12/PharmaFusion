@@ -7,47 +7,81 @@ import { useEffect, useState } from "react";
 import FormDataMedis from "@/components/blocks/FormDataMedis";
 import FormKeluhan from "@/components/blocks/FormKeluhan";
 import HasilDiagnosa from "@/components/blocks/HasilDiagnosa";
+import { useAuth } from "@/utils/AuthProvider";
 
 const user = {
     name: "John Doe",
     imageUrl: ""
-}
+};
 
 export default function PasienPage() {
     const [tab, setTab] = useState("1");
+    const { user } = useAuth();
+
+    const [predictedResult, setPredictedResult] = useState(null); // State untuk menyimpan hasil prediksi
+
 
     const getInitial = (name) => {
         return name ? name.charAt(0).toUpperCase() : '';
+    };
+
+    const handlePrediction = async (symptoms) => {
+        // Fungsi untuk mengirim data ke API prediksi
+        const symptomOrder = ["itching", "skin_rash", "nodal_skin_eruptions", "continuous_sneezing", "shivering", /* ...other symptoms... */ "fluid_overload.1"];
+
+        const sortSymptoms = (symptoms) => {
+            return symptomOrder.map((key) => symptoms[key] ?? null);
+        };
+
+        const sortedSymptoms = sortSymptoms(symptoms);
+
+        try {
+            const response = await fetch("/api/predict", {
+                method: "POST",
+                body: JSON.stringify({ data: sortedSymptoms }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const result = await response.json();
+            setPredictedResult(result); // Simpan hasil prediksi
+            setTab("3"); // Pindah ke tab hasil diagnosa
+        } catch (error) {
+            console.error("Prediction failed:", error);
+        }
     };
 
     return (
         <main className="w-full flex bg-app p-4 min-h-screen">
             <div className="bg-white ml-48 w-full rounded-2xl text-foreground pt-5 pb-12 px-10">
                 <header className="flex justify-end items-center gap-2">
-                    <p className="text-gray-600">Username</p>
+                    <p className="text-gray-600">{user?.username}</p>
                     <Avatar>
-                        {user.imageUrl ?
-                            (<AvatarImage src={user.imageUrl} alt={"@" + user.name} />)
-                            : (<AvatarFallback>{getInitial(user.name)}</AvatarFallback>)
+                        {user?.image ?
+                            (<AvatarImage src={user?.image} alt={"@" + user?.username} />)
+                            : (<AvatarFallback className="font-medium">{getInitial(user?.username)}</AvatarFallback>)
                         }
                     </Avatar>
                 </header>
-                {
-                    tab == '1' && (
-                        <FormDataMedis getValues={(val) => console.log(val)} onNext={(tab) => setTab(tab)} />
-                    )
-                }
-                {
-                    tab == '2' && (
-                        <FormKeluhan getValues={(val) => console.log(val)} onNext={(tab) => setTab(tab)} />
-                    )
-                }
-                {
-                    tab == '3' && (
-                        <HasilDiagnosa />
-                    )
-                }
+
+                {/* Tab Navigasi */}
+                {tab === '1' && (
+                    <FormDataMedis
+                        getValues={(val) => console.log(val)}
+                        onNext={(nextTab) => setTab(nextTab)}
+                    />
+                )}
+                {tab === '2' && (
+                    <FormKeluhan
+                        getValues={(val) => console.log(val)}
+                        onNext={(symptoms) => handlePrediction(symptoms)} // Kirim ke API dan pindah tab
+                    />
+                )}
+                {tab === '3' && (
+                    <HasilDiagnosa result={predictedResult} />
+                )}
             </div>
         </main>
-    )
+    );
 }
