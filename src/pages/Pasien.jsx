@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import FormDataMedis from "@/components/blocks/FormDataMedis";
 import FormKeluhan from "@/components/blocks/FormKeluhan";
 import HasilDiagnosa from "@/components/blocks/HasilDiagnosa";
+import { useAuth } from "@/utils/AuthProvider";
 
 const user = {
     name: "John Doe",
@@ -14,8 +15,11 @@ const user = {
 };
 
 export default function PasienPage() {
-    const [tab, setTab] = useState("1"); // Tab state untuk navigasi
+    const [tab, setTab] = useState("1");
+    const { user } = useAuth();
+
     const [predictedResult, setPredictedResult] = useState(null); // State untuk menyimpan hasil prediksi
+
 
     const getInitial = (name) => {
         return name ? name.charAt(0).toUpperCase() : '';
@@ -52,11 +56,11 @@ export default function PasienPage() {
         <main className="w-full flex bg-app p-4 min-h-screen">
             <div className="bg-white ml-48 w-full rounded-2xl text-foreground pt-5 pb-12 px-10">
                 <header className="flex justify-end items-center gap-2">
-                    <p className="text-gray-600">Username</p>
+                    <p className="text-gray-600">{user?.username}</p>
                     <Avatar>
-                        {user.imageUrl ?
-                            (<AvatarImage src={user.imageUrl} alt={"@" + user.name} />)
-                            : (<AvatarFallback>{getInitial(user.name)}</AvatarFallback>)
+                        {user?.image ?
+                            (<AvatarImage src={user?.image} alt={"@" + user?.username} />)
+                            : (<AvatarFallback className="font-medium">{getInitial(user?.username)}</AvatarFallback>)
                         }
                     </Avatar>
                 </header>

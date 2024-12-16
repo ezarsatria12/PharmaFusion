@@ -15,10 +15,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Icon } from "@iconify/react"
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, Navigate, useNavigate } from "react-router-dom"
 import bg_accent from "../assets/hero-bg-accent.svg"
 import bg_button from "../assets/bg-button-accent.svg"
 import ilustrator from "../assets/hero-ilustrator.png"
+import { useAuth } from "@/utils/AuthProvider"
 
 const formSchema = z.object({
   username: z.string().min(3, {
@@ -37,6 +38,7 @@ const formSchema = z.object({
 export default function RegisterPage() {
   const [pwdType, setPwdType] = useState('password');
   const [eyeIcon, setEyeIcon] = useState("mdi:eye-off-outline");
+  const { isAuthenticated } = useAuth()
 
   const navigate = useNavigate()
 
@@ -62,6 +64,10 @@ export default function RegisterPage() {
       setEyeIcon("mdi:eye-off-outline")
       setPwdType('password')
     }
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/pasien" replace />
   }
 
   return (
@@ -123,7 +129,7 @@ export default function RegisterPage() {
               )}
             />
             <Button type="submit">Submit</Button>
-            <p className="text-sm text-center text-gray-600">Sudah punya akun? <Link className="text-app" to="/login">Sign In</Link></p>
+            <p className="text-sm text-center text-gray-600">Sudah punya akun? <Link className="text-app" to="/login" replace>Sign In</Link></p>
           </form>
         </Form>
         <div className="z-10 mx-auto w-full max-w-96 flex flex-col gap-4">
@@ -143,7 +149,7 @@ export default function RegisterPage() {
         <img className="object-contain h-fit" src="/logo.png" alt="Logo" width={120} />
         <h1 className="text-center mt-4 space text-4xl font-bold">Halo! Selamat datang di <br /> PharmaFusion</h1>
         <p className="text-lg font-medium mt-2">Jika sudah memiliki akun</p>
-        <button onClick={() => navigate("/login")} className="relative mt-2">
+        <button onClick={() => navigate("/login", { replace: true })} className="relative mt-2">
           <img src={bg_button} width={150} />
           <span className="absolute left-1/2 -translate-x-1/2 top-5 -translate-y-1/2 font-bold text-xl">Sign In</span>
         </button>
