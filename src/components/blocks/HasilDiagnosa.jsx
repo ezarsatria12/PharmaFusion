@@ -20,17 +20,15 @@ const formSchema = z.object({
     username: z.string().min(3, {
         message: "Masukan username atau email minimal 3 karakter.",
     }),
-    email:
-        z.string().email({
-            message: "Masukan email yang valid.",
-        }),
+    email: z.string().email({
+        message: "Masukan email yang valid.",
+    }),
     message: z.string().min(10, {
         message: "Masukan pesan minimal 10 karakter.",
     }),
 })
 
-
-export default function HasilDiagnosa() {
+export default function HasilDiagnosa({ result }) {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -43,9 +41,15 @@ export default function HasilDiagnosa() {
             password: "",
         },
     })
+
     function onSubmit(values) {
         console.log(values)
     }
+
+    if (!result) {
+        return <p>Memuat data hasil diagnosa...</p>;
+    }
+
     return (
         <>
             <div className="flex justify-between items-center mt-10">
@@ -53,42 +57,40 @@ export default function HasilDiagnosa() {
             </div>
             <div className="mt-5">
                 <p>
-                    Dari hasil diagnosa, Anda teridentifikasi mengalami penyakit Infeksi jamur, yang merupakan kondisi kulit yang umum terjadi yang disebabkan oleh jamur. Berdasarkan analisis, kemungkinan Anda mengalami kondisi ini adalah sebesar 85%.
+                    Dari hasil diagnosa, Anda teridentifikasi mengalami penyakit <b>{result.penyakit}</b>, yang merupakan kondisi kulit yang umum terjadi yang disebabkan oleh jamur. Berdasarkan analisis, kemungkinan Anda mengalami kondisi ini adalah sebesar <b>{result.probabilitas.toFixed(2)}%</b>.
                 </p>
                 <br />
                 <p>
-                    Berikut rekomendasi obat, gejala yang sering dialami, dan cara pencegahannya :
+                    Berikut rekomendasi obat, gejala yang sering dialami, dan cara pencegahannya:
                 </p>
                 <br />
                 <p>
-                    <b>Obat :</b>
-                    <br />
+                    <b>Obat:</b>
                     <ul>
-                        <li>Krim Anti Jamur</li>
+                        {result.medicines.map((medicine, index) => (
+                            <li key={index}>
+                                <b>{medicine.name}</b>: {medicine.description}
+                            </li>
+                        ))}
                     </ul>
-                    <b>Komposisi obat :</b>
-                    <br />
-                    <p>klotrimazol, ekonazol, ketokonazol, mikonazol, tiokonazol, terbinafin, dan amorolfin</p>
-                    <b>Keterangan obat :</b>
-                    <br />
-                    <p>fungisida farmasi atau fungistatik yang digunakan untuk mengobati dan mencegah mikosis</p>
                 </p>
                 <br />
-                <p><b>Gejala yang sering dialami :</b></p>
+                <p><b>Gejala yang sering dialami:</b></p>
                 <ul className="list-disc ml-4">
-                    <li>Gatal</li>
-                    <li>Ruam Kulit</li>
-                    <li>Letusan kulit nodal</li>
-                    <li>Bercak-bercak diskromik</li>
+                    {result.symptoms ? (
+                        result.symptoms.map((symptom, index) => (
+                            <li key={index}>{symptom}</li>
+                        ))
+                    ) : (
+                        <li>Data gejala tidak tersedia</li>
+                    )}
                 </ul>
                 <br />
-                <p><b>Cara pencegahan :</b></p>
+                <p><b>Cara pencegahan:</b></p>
                 <ol className="list-decimal ml-4">
-                    <li>Menjaga kebersihan tubuh</li>
-                    <li>Mandi dua kali sehari</li>
-                    <li>Gunakan antiseptik pada air mandi</li>
-                    <li>jaga area yang terinfeksi tetap kering</li>
-                    <li>Menghindari kontak langsung dengan penderita</li>
+                    {result.precautions.map((precaution, index) => (
+                        <li key={index}>{precaution}</li>
+                    ))}
                 </ol>
             </div>
             <hr className="mt-5" />
