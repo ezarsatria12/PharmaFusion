@@ -108,7 +108,6 @@ const gejalaHatiKemih = [
     { id: "14", label: "Fluid overload" },
     { id: "15", label: "Swelling of stomach" },
     { id: "16", label: "Swelled lymph nodes" },
-    { id: "17", label: "Malaise" },
 ];
 
 const gejalaSaraf = [

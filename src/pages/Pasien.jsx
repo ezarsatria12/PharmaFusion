@@ -31,7 +31,7 @@ export default function PasienPage() {
     try {
         // Menggunakan axios untuk mengirim permintaan POST
         const response = await axios.post("http://127.0.0.1:5000/api/predict", {
-            features: symptoms
+            features : symptoms
         }, {
             headers: {
                 "Content-Type": "application/json"
