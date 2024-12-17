@@ -3,9 +3,10 @@
 # dependencies
 /node_modules
 /api/flaskapi
+__pycache__
 /.pnp
 .pnp.js
-
+/backend_env
 # testing
 /coverage
 
@@ -22,3 +23,24 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+
+node_modules
+flaskapi
+__pycache__
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
